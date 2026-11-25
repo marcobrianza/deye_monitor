@@ -146,6 +146,8 @@ that another run is using the same output file.
 
 ## Register references
 
+See [Modbus register references](MODBUS_REFERENCES.md) for the source versions, original links and SHA-256 checksums.
+
 - [Deye three-phase protocol V105.4](https://github.com/davidrapan/ha-solarman/wiki/Documentation#deye)
 - [Deye three-phase protocol PDF](https://download.axilogi.com/DEYE/Other/MODBUS_RTU.pdf)
 - [Three-phase hybrid register map in YAML](https://github.com/Developer089/deye-modbus-ha/blob/main/custom_components/deye_modbus/maps/sun_3ph_hybrid.yaml)
