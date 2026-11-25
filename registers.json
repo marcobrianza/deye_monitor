@@ -1,0 +1,1004 @@
+{
+  "Solar PV": [
+    {
+      "name": "Power PV1",
+      "addresses": [
+        672
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage PV1",
+      "addresses": [
+        676
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Current PV1",
+      "addresses": [
+        677
+      ],
+      "unit": "A",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power PV2",
+      "addresses": [
+        673
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage PV2",
+      "addresses": [
+        678
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Current PV2",
+      "addresses": [
+        679
+      ],
+      "unit": "A",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    }
+  ],
+  "Battery": [
+    {
+      "name": "SOC",
+      "addresses": [
+        588
+      ],
+      "unit": "%",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power",
+      "addresses": [
+        590
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage",
+      "addresses": [
+        587
+      ],
+      "unit": "V",
+      "scale": 0.01,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Current",
+      "addresses": [
+        591
+      ],
+      "unit": "A",
+      "scale": 0.01,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Temperature",
+      "addresses": [
+        586
+      ],
+      "unit": "°C",
+      "scale": 0.1,
+      "signed": false,
+      "offset": -1000,
+      "display": "number"
+    }
+  ],
+  "Grid": [
+    {
+      "name": "Total power",
+      "addresses": [
+        625,
+        690
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L1",
+      "addresses": [
+        622,
+        687
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L1",
+      "addresses": [
+        598
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L2",
+      "addresses": [
+        623,
+        688
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L2",
+      "addresses": [
+        599
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L3",
+      "addresses": [
+        624,
+        689
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L3",
+      "addresses": [
+        600
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    }
+  ],
+  "LOAD": [
+    {
+      "name": "Total power",
+      "addresses": [
+        653,
+        659
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L1",
+      "addresses": [
+        650,
+        656
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L1",
+      "addresses": [
+        644
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L2",
+      "addresses": [
+        651,
+        657
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L2",
+      "addresses": [
+        645
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L3",
+      "addresses": [
+        652,
+        658
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L3",
+      "addresses": [
+        646
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    }
+  ],
+  "GEN": [
+    {
+      "name": "Total power",
+      "addresses": [
+        667,
+        671
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L1",
+      "addresses": [
+        664,
+        668
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L1",
+      "addresses": [
+        661
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L2",
+      "addresses": [
+        665,
+        669
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L2",
+      "addresses": [
+        662
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L3",
+      "addresses": [
+        666,
+        670
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L3",
+      "addresses": [
+        663
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    }
+  ],
+  "Inverter output": [
+    {
+      "name": "Total power",
+      "addresses": [
+        636,
+        694
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L1",
+      "addresses": [
+        633,
+        691
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L1",
+      "addresses": [
+        627
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L2",
+      "addresses": [
+        634,
+        692
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L2",
+      "addresses": [
+        628
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L3",
+      "addresses": [
+        635,
+        693
+      ],
+      "unit": "W",
+      "scale": 1,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Voltage L3",
+      "addresses": [
+        629
+      ],
+      "unit": "V",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    }
+  ],
+  "AC Solar": [
+    {
+      "name": "Power L1",
+      "addresses": [
+        684
+      ],
+      "unit": "W",
+      "scale": 10,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L2",
+      "addresses": [
+        685
+      ],
+      "unit": "W",
+      "scale": 10,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Power L3",
+      "addresses": [
+        686
+      ],
+      "unit": "W",
+      "scale": 10,
+      "signed": true,
+      "offset": 0,
+      "display": "number"
+    }
+  ],
+  "Energy": [
+    {
+      "name": "PV generation today",
+      "addresses": [
+        529
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "PV generation lifetime",
+      "addresses": [
+        534,
+        535
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Grid import today",
+      "addresses": [
+        520
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Grid import lifetime",
+      "addresses": [
+        522,
+        523
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Grid export today",
+      "addresses": [
+        521
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Grid export lifetime",
+      "addresses": [
+        524,
+        525
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "LOAD consumption today",
+      "addresses": [
+        526
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "LOAD consumption lifetime",
+      "addresses": [
+        527,
+        528
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Battery charge today",
+      "addresses": [
+        514
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Battery charge lifetime",
+      "addresses": [
+        516,
+        517
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Battery discharge today",
+      "addresses": [
+        515
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Battery discharge lifetime",
+      "addresses": [
+        518,
+        519
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "GEN energy today",
+      "addresses": [
+        536
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "GEN energy lifetime",
+      "addresses": [
+        537,
+        538
+      ],
+      "unit": "kWh",
+      "scale": 0.1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    }
+  ],
+  "Status and alarms": [
+    {
+      "name": "On/off status",
+      "addresses": [
+        551
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hex"
+    },
+    {
+      "name": "AC relays",
+      "addresses": [
+        552
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hex"
+    },
+    {
+      "name": "Warnings 1",
+      "addresses": [
+        553
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hex"
+    },
+    {
+      "name": "Warnings 2",
+      "addresses": [
+        554
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hex"
+    },
+    {
+      "name": "Faults 1",
+      "addresses": [
+        555
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hex"
+    },
+    {
+      "name": "Faults 2",
+      "addresses": [
+        556
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hex"
+    },
+    {
+      "name": "Faults 3",
+      "addresses": [
+        557
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hex"
+    },
+    {
+      "name": "Faults 4",
+      "addresses": [
+        558
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hex"
+    }
+  ],
+  "Configuration": [
+    {
+      "name": "Maximum charge current",
+      "addresses": [
+        108
+      ],
+      "unit": "A",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Maximum discharge current",
+      "addresses": [
+        109
+      ],
+      "unit": "A",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Work mode",
+      "addresses": [
+        142
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Solar Sell",
+      "addresses": [
+        145
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    }
+  ],
+  "Battery reserve · Time of Use": [
+    {
+      "name": "Schedule",
+      "addresses": [
+        146
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "tou"
+    },
+    {
+      "name": "Slot 1 · Start",
+      "addresses": [
+        148
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hhmm"
+    },
+    {
+      "name": "Slot 1 · Minimum SOC",
+      "addresses": [
+        166
+      ],
+      "unit": "%",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Slot 1 · Charge source",
+      "addresses": [
+        172
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "charge"
+    },
+    {
+      "name": "Slot 2 · Start",
+      "addresses": [
+        149
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hhmm"
+    },
+    {
+      "name": "Slot 2 · Minimum SOC",
+      "addresses": [
+        167
+      ],
+      "unit": "%",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Slot 2 · Charge source",
+      "addresses": [
+        173
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "charge"
+    },
+    {
+      "name": "Slot 3 · Start",
+      "addresses": [
+        150
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hhmm"
+    },
+    {
+      "name": "Slot 3 · Minimum SOC",
+      "addresses": [
+        168
+      ],
+      "unit": "%",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Slot 3 · Charge source",
+      "addresses": [
+        174
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "charge"
+    },
+    {
+      "name": "Slot 4 · Start",
+      "addresses": [
+        151
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hhmm"
+    },
+    {
+      "name": "Slot 4 · Minimum SOC",
+      "addresses": [
+        169
+      ],
+      "unit": "%",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Slot 4 · Charge source",
+      "addresses": [
+        175
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "charge"
+    },
+    {
+      "name": "Slot 5 · Start",
+      "addresses": [
+        152
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hhmm"
+    },
+    {
+      "name": "Slot 5 · Minimum SOC",
+      "addresses": [
+        170
+      ],
+      "unit": "%",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Slot 5 · Charge source",
+      "addresses": [
+        176
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "charge"
+    },
+    {
+      "name": "Slot 6 · Start",
+      "addresses": [
+        153
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "hhmm"
+    },
+    {
+      "name": "Slot 6 · Minimum SOC",
+      "addresses": [
+        171
+      ],
+      "unit": "%",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "number"
+    },
+    {
+      "name": "Slot 6 · Charge source",
+      "addresses": [
+        177
+      ],
+      "unit": "",
+      "scale": 1,
+      "signed": false,
+      "offset": 0,
+      "display": "charge"
+    }
+  ]
+}

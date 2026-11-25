@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deye Monitor</title>
+<style>
+:root{color-scheme:dark;background:#13201e;color:#f2f5ef;font:16px system-ui,sans-serif}
+body{max-width:1180px;margin:auto;padding:clamp(20px,5vw,64px)}
+header{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+h1{margin:0;font-size:1.25rem;letter-spacing:-.015em}
+p{margin:.4rem 0;color:#b7cbc2}
+#status{padding:14px 16px;background:#233530;border-radius:10px;margin-bottom:24px}
+#status[data-warn=true]{color:#ffd799}
+main{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;align-items:start}
+section{border:1px solid #385049;background:#192925;border-radius:12px;padding:16px}
+h2{margin:0 0 12px;font-size:1.15rem;color:#b0e3c5}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+td,th{padding:7px 0;text-align:left;border-top:1px solid #30463e}
+td:last-child,th:last-child{text-align:right;white-space:nowrap;padding-left:8px}
+small{display:block;color:#b7cbc2;font-weight:400;font-size:.75rem}
+#reserve,#gen{margin-top:16px}
+#reserve-table{margin:12px 0}
+#reserve-table td:last-child{width:1%}
+#reserve-table button[aria-pressed=false]{background:#30463e;color:#f2f5ef}
+#reserve form{display:flex;align-items:end;gap:12px;flex-wrap:wrap}
+#reserve label{display:grid;gap:5px}
+select,input,button{font:inherit}
+select,input[type=number],button{border:1px solid #557365;border-radius:6px;padding:7px}
+button{background:#b0e3c5;color:#13201e;cursor:pointer}
+button:disabled{opacity:.55;cursor:default}
+label{display:flex;align-items:center;gap:7px;color:#d2ded8}
+#bus,.publisher-status{display:flex;align-items:center;gap:9px;margin:0 0 16px;color:#b7cbc2}
+#bus-led,.publisher-led{width:10px;height:10px;border-radius:50%;background:#6a8a7b;flex:none}
+#bus[data-state=ok] #bus-led,.publisher-status[data-state=ok] .publisher-led{background:#82ffc0}
+#bus[data-state=error] #bus-led,.publisher-status[data-state=error] .publisher-led{background:#ff9e83}
+#bus[data-reading=true] #bus-led{animation:bus-pulse .75s ease-in-out infinite alternate}
+.publisher-status span{overflow-wrap:anywhere}
+@keyframes bus-pulse{to{background:#65aaff;box-shadow:0 0 10px #65aaff}}
+@media(prefers-reduced-motion:reduce){#bus[data-reading=true] #bus-led{animation:none;background:#65aaff}}
+#power-overview,#daily-overview{margin-bottom:24px}
+#power-cards,#daily-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.power-card{background:#203832;border-radius:9px;padding:14px}
+.power-card h3{font-size:1rem;margin:0;color:#d2ded8}
+.power-card strong{display:block;margin:5px 0;font-size:clamp(1.4rem,3vw,2.2rem);font-variant-numeric:tabular-nums}
+.power-card small{font-size:.82rem}
+@media(max-width:700px){#power-cards,#daily-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:345px){#power-cards,#daily-cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<div><h1>Deye Monitor</h1><!-- location-label --><p><!-- inverter-model --></p></div>
+<label><input type="checkbox" id="raw"> Register addresses and raw values</label>
+</header>
+<div id="status" role="status">Waiting for the first reading…</div>
+<div id="bus"><span id="bus-led" aria-hidden="true"></span><span id="bus-label">Modbus · Waiting for the monitor…</span></div>
+<div id="database" class="publisher-status" role="status"><span class="publisher-led" aria-hidden="true"></span><span id="database-label">InfluxDB · Waiting for the monitor…</span></div>
+<div id="mqtt" class="publisher-status" role="status"><span class="publisher-led" aria-hidden="true"></span><span id="mqtt-label">MQTT · Waiting for the monitor…</span></div>
+<section id="power-overview" aria-labelledby="power-heading">
+<h2 id="power-heading">Live power</h2>
+<div id="power-cards"></div>
+</section>
+<section id="daily-overview" aria-labelledby="daily-heading">
+<h2 id="daily-heading">Today · Energy</h2>
+<div id="daily-cards"></div>
+<p id="solar-allocation"></p>
+</section>
+<main id="groups"></main>
+<section id="reserve">
+<h2>Battery reserve · Time of Use</h2>
+<p id="reserve-schedule"></p>
+<table id="reserve-table"><tbody></tbody></table>
+<form id="reserve-form">
+<p id="selected-slot"></p>
+<label>Stop discharge at (%) <input id="reserve-value" type="number" min="0" max="100" step="1" required></label>
+<button id="save-reserve" type="submit" disabled>Save to inverter</button>
+</form>
+<p id="reserve-result" role="status"></p>
+</section>
+<div id="gen"></div>
+<script>
+const statusBox = document.getElementById('status');
+const grid = document.getElementById('groups');
+const rawToggle = document.getElementById('raw');
+const number = new Intl.NumberFormat('en-GB', {maximumFractionDigits: 3});
+let snapshot;
+const bus = document.getElementById('bus');
+const busLabel = document.getElementById('bus-label');
+
+const date = t => new Date(t).toLocaleString('en-GB');
+
+function updateBus() {
+    const offline = statusBox.dataset.connection === 'offline';
+    const disabled = snapshot?.modbus_enabled === false;
+    const attempt = snapshot?.attempt;
+    const failed = attempt && (!attempt.read_count || attempt.error || attempt.rejected.length);
+    bus.dataset.state = offline ? 'error' : !snapshot || disabled ? 'idle' : failed ? 'error' : 'ok';
+    bus.dataset.reading = !offline && !disabled && Boolean(snapshot?.reading);
+    let message = 'Waiting for the first reading…';
+    if (offline) {
+        message = 'Monitor unavailable';
+    } else if (disabled) {
+        message = 'Polling disabled';
+    } else if (snapshot?.reading) {
+        message = 'Reading inverter registers…';
+    } else if (snapshot?.next_read_at != null) {
+        const seconds = Math.ceil(snapshot.next_read_at - Date.now() / 1000);
+        message = seconds > 0 ? 'Next reading in ' + seconds + ' s' : 'Waiting for the next reading…';
+    }
+    if (!offline && !disabled && failed) message = 'Last reading failed · ' + message;
+    busLabel.textContent = 'Modbus · ' + message;
+}
+
+const reserveRows = document.querySelector('#reserve-table tbody');
+const selectedSlotLabel = document.getElementById('selected-slot');
+const gen = document.getElementById('gen');
+const reserveValue = document.getElementById('reserve-value');
+const saveButton = document.getElementById('save-reserve');
+const feedback = document.getElementById('reserve-result');
+let saving = false;
+let editing = false;
+let selectedSlot = 0;
+const slotRows = Array.from({length: 6}, (_, index) => {
+    const row = reserveRows.insertRow();
+    const label = element('th', '', row);
+    label.scope = 'row';
+    const address = element('small', '', label);
+    const title = document.createTextNode('');
+    label.prepend(title);
+    const value = element('td', '', row);
+    const action = element('button', 'Edit', element('td', '', row));
+    action.type = 'button';
+    action.addEventListener('click', () => {
+        selectedSlot = index;
+        editing = false;
+        updateEditor();
+        reserveValue.focus();
+    });
+    return {title, address, value, action};
+});
+function reservePoints() {
+    return snapshot?.attempt?.groups['Battery reserve · Time of Use'];
+}
+function scheduleInfo(points) {
+    const times = Array.from({length: 6}, (_, i) => points?.[1 + i * 3]?.value);
+    if (times.some(t => !Number.isInteger(t) || t < 0 || t > 2359 || t % 100 > 59)) {
+        return {ordered: false, main: false, note: 'Schedule times are incomplete or invalid.'};
+    }
+    const wraps = times.filter((time, i) => time >= times[(i + 1) % 6]).length;
+    const ordered = wraps === 1 && new Set(times).size === 6;
+    const main = !ordered && times[0] === 0 && times[1] === 2355;
+    const note = main
+        ? 'Likely main slot: 00:00–23:55. The remaining start times are out of order, so their effective ranges are unconfirmed.'
+        : ordered ? '' : 'Start times are out of order. The effective slot ranges are unconfirmed.';
+    return {ordered, main, note};
+}
+function slotRange(points, index, schedule) {
+    const start = points?.[1 + index * 3];
+    const end = points?.[1 + ((index + 1) % 6) * 3];
+    if (!start || start.value === null) return '—';
+    if (schedule.main && index === 0) return '00:00–23:55 (likely)';
+    if (schedule.ordered) return formatValue(start) + '–' + formatValue(end);
+    return 'Reported start ' + formatValue(start);
+}
+function updateEditor() {
+    const points = reservePoints();
+    const schedule = scheduleInfo(points);
+    document.getElementById('reserve-schedule').textContent = points
+        ? [formatValue(points[0]), schedule.note].filter(Boolean).join(' · ')
+        : 'Waiting for schedule data…';
+    for (const [i, row] of slotRows.entries()) {
+        const start = points?.[1 + i * 3];
+        const minimum = points?.[2 + i * 3];
+        const charge = points?.[3 + i * 3];
+        row.title.textContent = 'Slot ' + (i + 1) + ' · ' + slotRange(points, i, schedule);
+        row.address.textContent = charge ? formatValue(charge) : '';
+        if (rawToggle.checked && start && minimum && charge) {
+            row.address.textContent += ' · ' + [start, minimum, charge]
+                .map(p => p.addresses[0] + '=' + (p.raw[0] ?? '—')).join(' · ');
+        }
+        row.value.textContent = minimum ? formatValue(minimum) : '—';
+        row.action.setAttribute('aria-pressed', i === selectedSlot);
+        row.action.setAttribute('aria-label', 'Edit slot ' + (i + 1));
+        row.action.disabled = saving || !Number.isInteger(minimum?.value);
+    }
+    const actual = points?.[2 + selectedSlot * 3]?.value;
+    selectedSlotLabel.textContent = 'Slot ' + (selectedSlot + 1) + ' · ' + slotRange(points, selectedSlot, schedule);
+    if (!editing && !saving) reserveValue.value = actual ?? '';
+    saveButton.disabled = saving || statusBox.dataset.connection === 'offline'
+        || !Number.isInteger(actual) || actual < 0 || actual > 100;
+}
+reserveValue.addEventListener('input', () => { editing = true; });
+document.getElementById('reserve-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    if (saving || saveButton.disabled) return;
+    const slot = selectedSlot + 1;
+    const expected = reservePoints()[2 + (slot - 1) * 3].value;
+    const value = reserveValue.valueAsNumber;
+    if (!window.confirm('Set slot ' + slot + ' to ' + value + '%?')) return;
+    saving = true;
+    updateEditor();
+    feedback.textContent = 'Saving and verifying…';
+    try {
+        const response = await fetch('/api/reserve', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({slot, expected, value})
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+        reservePoints()[2 + (slot - 1) * 3].value = result.value;
+        editing = false;
+        feedback.textContent = 'Slot ' + slot + ' · ' + result.value + '% confirmed by the inverter.';
+        render();
+    } catch (error) {
+        feedback.textContent = 'Save not confirmed · ' + error.message;
+    } finally {
+        saving = false;
+        updateEditor();
+    }
+});
+function element(tag, text, parent) {
+    const node = document.createElement(tag);
+    node.textContent = text;
+    parent.append(node);
+    return node;
+}
+function formatValue(point) {
+    const value = point.value;
+    if (value === null) return '—';
+    switch (point.display) {
+    case 'hex':
+        return '0x' + value.toString(16).toUpperCase().padStart(4, '0');
+    case 'hhmm': {
+        const hours = Math.floor(value / 100);
+        const minutes = value % 100;
+        if (hours > 23 || minutes > 59) return String(value) + ' (unconfirmed)';
+        return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+    }
+    case 'tou':
+        return (value & 1) ? 'Enabled' : 'Disabled';
+    case 'charge':
+        return ['PV', 'PV + grid', 'PV + GEN', 'PV + grid + GEN'][value] ?? String(value);
+    default:
+        return number.format(value) + (point.unit ? ' ' + point.unit : '');
+    }
+}
+function renderPower(groups) {
+    const read = (group, name) => groups[group]?.find(point => point.name === name)?.value ?? null;
+    const pv1 = read('Solar PV', 'Power PV1');
+    const pv2 = read('Solar PV', 'Power PV2');
+    const pv = pv1 === null || pv2 === null ? null : pv1 + pv2;
+    const gridPower = read('Grid', 'Total power');
+    const load = read('LOAD', 'Total power');
+    const battery = read('Battery', 'Power');
+    const soc = read('Battery', 'SOC');
+    const direction = (watts, positive, negative) =>
+        watts === null ? 'Unavailable' : watts > 0 ? positive : watts < 0 ? negative : 'Idle';
+    const cards = [
+        ['Solar PV', pv, pv === null ? 'Unavailable' : 'PV1 + PV2 generation'],
+        ['Grid', gridPower, direction(gridPower, 'Importing from grid', 'Exporting to grid')],
+        ['LOAD', load, load === null ? 'Unavailable' : 'Power at the LOAD output'],
+        ['Battery', battery, direction(battery, 'Discharging', 'Charging')
+            + (soc === null ? '' : ' · ' + number.format(soc) + '% SOC')],
+    ];
+    renderCards('power-cards', cards.map(([name, watts, detail]) =>
+        [name, watts === null ? null : Math.abs(watts) / 1000, detail]), 'kW');
+}
+function renderCards(id, cards, unit) {
+    const overview = document.getElementById(id);
+    overview.replaceChildren();
+    for (const [name, value, detail] of cards) {
+        const card = element('article', '', overview);
+        card.className = 'power-card';
+        element('h3', name, card);
+        element('strong', value === null ? '—' : number.format(value) + ' ' + unit, card);
+        if (detail) element('small', detail, card);
+    }
+}
+function renderDaily(groups) {
+    const read = name => groups.Energy?.find(point => point.name === name + ' today')?.value ?? null;
+    const pv = read('PV generation');
+    const load = read('LOAD consumption');
+    const charge = read('Battery charge');
+    const discharge = read('Battery discharge');
+    const imported = read('Grid import');
+    const exported = read('Grid export');
+    const generated = read('GEN energy');
+    const solarOnlyCharge = groups['Battery reserve · Time of Use']
+        ?.filter(point => point.display === 'charge').every(point => point.value === 0);
+    renderCards('daily-cards', [
+        ['Solar generated', pv],
+        ['LOAD consumption', load],
+        ['Battery charged', charge, discharge === null ? '' : number.format(discharge) + ' kWh discharged'],
+        ['Grid exported', exported, imported === null ? '' : number.format(imported) + ' kWh imported'],
+    ], 'kWh');
+    const allocation = document.getElementById('solar-allocation');
+    allocation.textContent = 'The inverter reports total energy at each connection. The source of battery charge and grid exports is not measured separately.';
+    if ([pv, load, charge, exported].some(value => value === null)
+            || generated !== 0 || !solarOnlyCharge || pv < charge + exported) return;
+    const remainder = pv - charge - exported;
+    allocation.textContent = 'Estimated solar split: ' + number.format(charge) + ' kWh to battery, '
+        + number.format(exported) + ' kWh to grid, and ' + number.format(remainder)
+        + ' kWh remaining for loads and conversion losses. Assumes solar was the only charging and export source all day.';
+}
+function render() {
+    if (!snapshot?.attempt) return;
+    const {attempt, last_good: previous, interval} = snapshot;
+    const degraded = Boolean(attempt.error || attempt.rejected.length);
+    const shown = degraded && previous ? previous : attempt;
+    const issue = [attempt.error, attempt.rejected.length ? attempt.rejected.length + ' registers rejected' : ''].filter(Boolean).join(' · ');
+    statusBox.dataset.warn = degraded;
+    statusBox.textContent = degraded
+        ? 'Last attempt ' + date(attempt.timestamp) + ' · ' + issue
+            + (shown.read_count ? ' · Showing data from: ' + date(shown.timestamp) : ' · No data available')
+        : 'Last reading ' + date(shown.timestamp) + ' · ' + shown.read_count + ' registers · every ' + interval + ' s';
+    renderPower(shown.groups);
+    renderDaily(shown.groups);
+    grid.replaceChildren();
+    gen.replaceChildren();
+    for (const [name, points] of Object.entries(shown.groups)) {
+        if (name === 'Battery reserve · Time of Use') continue;
+        const section = element('section', '', name === 'GEN' ? gen : grid);
+        element('h2', name, section);
+        const table = element('table', '', section);
+        for (const point of points) {
+            const row = table.insertRow();
+            const label = element('th', point.name, row);
+            label.scope = 'row';
+            if (rawToggle.checked) {
+                element('small', point.addresses.join(' + ') + ' · ' + point.raw.map(v => v ?? '—').join(' / '), label);
+            }
+            const value = formatValue(point);
+            element('td', value, row);
+        }
+    }
+}
+function updatePublisher(id, name, info, attempt) {
+    const status = document.getElementById(id);
+    const label = document.getElementById(id + '-label');
+    const title = info?.destination ? name + ' · ' + info.destination : name;
+    const lastWrite = info?.last_write ? ' · Last sample sent: ' + date(info.last_write) : '';
+    let state = info?.state ?? 'waiting';
+    let message = 'Logging enabled · Waiting for the first delivery';
+    if (!info) message = 'Status unavailable';
+    else if (state === 'disabled') message = 'Logging disabled';
+    else if (state === 'error') message = 'Logging error · ' + info.error;
+    else if (attempt?.read_count === 0) {
+        state = 'waiting';
+        message = 'Logging enabled · No inverter data in the latest poll';
+    } else if (state === 'ok') message = 'Logging active';
+    const text = title + ' · ' + message + lastWrite;
+    status.dataset.state = state;
+    if (label.textContent !== text) label.textContent = text;
+}
+async function refresh() {
+    let received = false;
+    try {
+        const response = await fetch('/api/snapshot', {cache:'no-store'});
+        if (!response.ok) throw new Error(response.status);
+        const incoming = await response.json();
+        received = true;
+        if (!snapshot || incoming.attempt?.timestamp !== snapshot.attempt?.timestamp
+                || statusBox.dataset.connection === 'offline') {
+            snapshot = incoming;
+            render();
+            if (!snapshot.attempt) {
+                statusBox.textContent = snapshot.modbus_enabled === false
+                    ? 'Modbus polling disabled' : 'Waiting for the first reading…';
+                statusBox.dataset.warn = false;
+            }
+        }
+        snapshot = incoming;
+        statusBox.dataset.connection = 'online';
+        updatePublisher('database', 'InfluxDB', incoming.influxdb, incoming.attempt);
+        updatePublisher('mqtt', 'MQTT', incoming.mqtt, incoming.attempt);
+        updateEditor();
+    } catch (error) {
+        if (received) {
+            statusBox.dataset.connection = 'online';
+            statusBox.dataset.warn = true;
+            statusBox.textContent = 'Dashboard update failed · ' + error.message;
+            return;
+        }
+        statusBox.dataset.connection = 'offline';
+        updatePublisher('database', 'InfluxDB', null);
+        updatePublisher('mqtt', 'MQTT', null);
+        updateEditor();
+        statusBox.dataset.warn = true;
+        statusBox.textContent = 'Python service unreachable · ' + error.message
+            + (snapshot?.attempt ? ' · Showing previous values' : '');
+    } finally {
+        updateBus();
+        setTimeout(refresh, 1000);
+    }
+}
+rawToggle.addEventListener('change', () => { render(); updateEditor(); });
+updateEditor();
+renderPower({});
+renderDaily({});
+refresh();
+</script>
+</body>
+</html>

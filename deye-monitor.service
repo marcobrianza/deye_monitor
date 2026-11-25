@@ -1,0 +1,20 @@
+[Unit]
+Description=Deye Monitor
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=deye-monitor
+Group=deye-monitor
+WorkingDirectory=/opt/deye-monitor
+ExecStart=/opt/deye-monitor/.venv/bin/python -u /opt/deye-monitor/deye_monitor.py
+Restart=always
+RestartSec=10s
+NoNewPrivileges=true
+PrivateTmp=true
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+[Install]
+WantedBy=multi-user.target

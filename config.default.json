@@ -1,0 +1,44 @@
+{
+  "location_label": "",
+  "model": "SUN-10K-SG05LP3-EU-SM2",
+  "poll_interval_seconds": 60,
+  "modbus_enabled": true,
+  "host": "192.168.13.20",
+  "port": 502,
+  "unit_id": 1,
+  "timeout_seconds": 1.5,
+  "request_pause_seconds": 0.1,
+  "web_host": "127.0.0.1",
+  "web_port": 8766,
+  "block_size": 60,
+  "ranges": [
+    [
+      0,
+      59
+    ],
+    [
+      60,
+      499
+    ],
+    [
+      500,
+      2000
+    ]
+  ],
+  "influxdb": {
+    "logging_enabled": false,
+    "host": "127.0.0.1",
+    "port": 8086,
+    "database": "lozza",
+    "username": "",
+    "password": ""
+  },
+  "mqtt": {
+    "logging_enabled": true,
+    "host": "192.168.13.13",
+    "port": 1883,
+    "topic": "lozza/deye",
+    "username": "",
+    "password": ""
+  }
+}
